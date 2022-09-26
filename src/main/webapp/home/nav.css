@@ -1,0 +1,40 @@
+nav a, aside a {
+    width: 100%;
+    padding: 0 8px;
+    display: flex;
+    box-sizing: border-box;
+    height: 52px;
+    align-items: center;
+    text-decoration: none;
+    font-weight: bold;
+    color: black;
+}
+
+nav a:visited, aside a:visited {
+    color: black;
+}
+
+nav a .label, aside a .label {
+    height: 100%;
+    padding: 0 8px;
+    border-radius: 8px;
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+nav a:hover .label, aside a:hover .label {
+    background: #dadada;
+}
+
+.user img {
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    margin: 12px 12px 12px 0
+}
+nav img {
+    width: 36px;
+    height: 36px;
+    margin: 12px 12px 12px 0
+}

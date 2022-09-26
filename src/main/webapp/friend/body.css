@@ -1,0 +1,9 @@
+body {
+    background: #f0f2f5 !important;
+    margin: 0;
+}
+.body {
+    margin-top: 56px;
+    width: 100%;
+    height: calc(100% - 56px);
+}

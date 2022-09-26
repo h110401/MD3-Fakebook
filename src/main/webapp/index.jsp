@@ -1,8 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<%--
+  Created by IntelliJ IDEA.
+  User: Hung
+  Date: 9/16/2022
+  Time: 8:21 AM
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
@@ -10,8 +15,8 @@
             integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
             crossorigin="anonymous"></script>
 
+    <title>Fakebook</title>
     <style>
-
         body {
             font-family: SFProDisplay-Regular, Helvetica, Arial, sans-serif;
         }
@@ -64,11 +69,32 @@
 </head>
 <body>
 
+<%
+    Cookie cookie = null;
+    Cookie[] cookies;
+
+    cookies = request.getCookies();
+
+    if (cookies != null) {
+        for (Cookie c : cookies) {
+            if (c.getName().equals("id")) {
+                cookie = c;
+                break;
+            }
+        }
+    }
+
+    if (cookie != null) {
+        request.setAttribute("id", cookie.getValue());
+        request.getRequestDispatcher("/login").forward(request, response);
+    }
+%>
+
 <div class="container-fluid justify-content-center" style="background: #f0f2f5">
     <div class="row justify-content-center" style="height: 740px;padding: 70px 0 112px">
         <div class="col-7 col-lg-4 pt-lg-5">
             <div class="d-flex flex-column d-lg-block align-items-center pt-lg-5 pe-lg-5 pb-lg-1 p-0">
-                <img src="img/logo.svg" alt="icon"
+                <img src="${pageContext.request.contextPath}/img/logo.svg" alt="icon"
                      style="width: 300px;height: 106px;">
                 <p style="font-size: 28px;margin-top: -10px;line-height: 32px"
                    class="text-center text-lg-start w-lg-100 w-fix ps-lg-4">
@@ -87,11 +113,11 @@
                 padding: 10px 18px 24px;
                 box-shadow: 0 2px 4px rgb(0 0 0 / 10%), 0 8px 16px rgb(0 0 0 / 10%);
             ">
-                <form action="#">
+                <form action="login" method="post">
 
                     <div style="display: flex; flex-direction: column">
-                        <input type="text" placeholder="Email address or phone number">
-                        <input type="password" placeholder="Password">
+                        <input type="text" name="email" placeholder="Email address or phone number">
+                        <input type="password" name="password" placeholder="Password">
                     </div>
 
                     <input type="submit" class="btn btn-primary w-100 fw-bold"
@@ -105,7 +131,7 @@
                     <div style="width: 360px; height: 1px; border-bottom: 1px solid #dadde1; margin: 20px 0"></div>
 
                     <div class="d-flex justify-content-center">
-                        <a href="#">
+                        <a href="register">
                             <input type="button"
                                    style="background:#42b72a; color: white; font-size: 17px; font-weight: bold; padding: 0 16px;margin: 0;height: 48px; border: none"
                                    value="Create new account">
@@ -182,5 +208,6 @@
 
     </div>
 </div>
+
 </body>
 </html>
