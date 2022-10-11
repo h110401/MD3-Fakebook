@@ -1,5 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <html>
 <head>
     <title>Home</title>
@@ -20,11 +23,11 @@
 </head>
 <body>
 
-<div style="display: none" id="userID">${sessionScope['userLogin'].getId()}</div>
+<div style="display: none" id="userId">${sessionScope['userLogin'].getId()}</div>
 
 <div class="f-logo">
     <div style="display: flex">
-        <a href="home">
+        <a href="${pageContext.request.contextPath}/home">
             <img src="${pageContext.request.contextPath}/img/f-logo.png" alt="f-logo" id="f-logo">
         </a>
         <form action="search" method="get">
@@ -38,12 +41,57 @@
     </div>
 </div>
 
-<div style="position: absolute; z-index: 1; right: 0;top: 0;">
+<div style="position: fixed; z-index: 1; right: 0;top: 0; display: flex;align-items: center;height: 56px;"
+     class="top-right-div">
+    <div>
+        <button onclick="displayNotification()">
+            <i class="bi bi-bell-fill"></i>
+        </button>
+    </div>
     <div>
         <a href="messenger">
-            <button>messenger</button>
+            <button>
+                <i class="bi bi-chat-dots-fill"></i>
+            </button>
         </a>
     </div>
+
+    <c:if test="${sessionScope['userLogin'].getRoleName() == 'ADMIN'}">
+        <div>
+            <a href="setting">
+                <button>
+                    <i class="bi bi-gear"></i>
+                </button>
+            </a>
+        </div>
+    </c:if>
+
+    <div>
+        <a href="logout">
+            <button>
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </a>
+    </div>
+
+</div>
+
+<div id="notice-div" style="display:none;padding: 10px; overflow: scroll; overflow-x: hidden">
+    <div style="margin: 10px 0 10px 0">
+        <h3>Notification</h3>
+    </div>
+    <c:forEach items="${requestScope['notificationList']}" var="noti">
+        <div style="display: grid; grid-template-columns: 80px auto;height: 80px;padding: 10px; border-radius: 8px"
+             class="noti">
+            <div>
+                <img src="${noti.userFrom.avatar}"
+                     alt="avatar" style="height: 60px;width: 60px;border-radius: 50%">
+            </div>
+            <div>
+                    ${noti.content}
+            </div>
+        </div>
+    </c:forEach>
 </div>
 
 <header>
@@ -56,8 +104,26 @@
         </li>
         <li>
             <div class="hoverable">
-                <a href="${pageContext.request.contextPath}/friend">
-                    <img src="${pageContext.request.contextPath}/img/header/friend.svg" alt="friend">
+                <a href="${pageContext.request.contextPath}/friend" style="position:relative;">
+                    <div style="display: inline-block; position: relative">
+                        <img src="${pageContext.request.contextPath}/img/header/friend.svg" alt="friend">
+                        <c:if test="${requestScope['requestNumber'] > 0}">
+                    <span class="bg-danger"
+                          style="
+                          padding: 0 5px;
+                          font-weight: 600;
+                          border-radius: 10px;
+                          position: absolute;
+                          top: 0;
+                          right: 0;
+                          min-width: 25px;
+                          text-align: center;
+                          transform: translate(50%,-50%);
+                    ">${requestScope['requestNumber']}
+                    </span>
+                        </c:if>
+                    </div>
+
                 </a>
             </div>
         </li>
@@ -90,11 +156,11 @@
     <div>
         <nav>
             <div style="margin-top: 16px">
-                <a href="#">
+                <a href="user?profile=${sessionScope['userLogin'].id}">
                     <div class="label user">
-                        <img src="https://scontent.fhan3-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?stp=cp0_dst-png_p40x40&_nc_cat=1&ccb=1-7&_nc_sid=dbb9e7&_nc_ohc=KGMN7pZGaI8AX-HifdX&_nc_ht=scontent.fhan3-1.fna&oh=00_AT-KSHFMj11ROQeuuj6O5hXp_bRhBtS-yxBFhr3-MdkMCA&oe=634CFC78"
+                        <img src="${sessionScope['userLogin'].avatar}"
                              alt="avatar">
-                        <div>${sessionScope['userLogin'].getName()} </div>
+                        <div>${sessionScope['userLogin'].name} </div>
                     </div>
                 </a>
                 <a href="friend">
@@ -118,10 +184,10 @@
         <section>
             <div class="create-post">
                 <div class="create-div" data-bs-toggle="modal" data-bs-target="#create-post-modal">
-                    <img src="https://scontent.fhan3-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?stp=cp0_dst-png_p40x40&_nc_cat=1&ccb=1-7&_nc_sid=dbb9e7&_nc_ohc=KGMN7pZGaI8AX-HifdX&_nc_ht=scontent.fhan3-1.fna&oh=00_AT-KSHFMj11ROQeuuj6O5hXp_bRhBtS-yxBFhr3-MdkMCA&oe=634CFC78"
-                         alt="avatar">
+                    <img src="${sessionScope['userLogin'].avatar}"
+                         alt="avatar" width="40" height="40">
                     <div>
-                        <div class="create-content">
+                        <div class="create-content" style="font-size: 15px">
                             What's on your mind, ${sessionScope['userLogin'].getName()} ?
                         </div>
                     </div>
@@ -159,8 +225,8 @@
                                 <div class="modal-body">
                                     <div style="margin: 0 16px; padding: 16px 0">
                                         <div class="user" style="display: flex">
-                                            <img src="https://scontent.fhan3-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?stp=cp0_dst-png_p40x40&_nc_cat=1&ccb=1-7&_nc_sid=dbb9e7&_nc_ohc=KGMN7pZGaI8AX-HifdX&_nc_ht=scontent.fhan3-1.fna&oh=00_AT-KSHFMj11ROQeuuj6O5hXp_bRhBtS-yxBFhr3-MdkMCA&oe=634CFC78"
-                                                 alt="avatar">
+                                            <img src="${sessionScope['userLogin'].avatar}"
+                                                 alt="avatar" width="40" height="40">
                                             <div style="display: flex; align-items: center">
                                                 <h5>${sessionScope['userLogin'].getName()}</h5></div>
                                         </div>
@@ -215,15 +281,19 @@
                     <div class="article-user">
                         <div style="display: flex; padding: 12px 16px 0; margin: 0 0 12px; justify-content: space-between">
                             <div style="display: flex">
-                                <img style="border-radius: 50%"
-                                     src="https://scontent.fhan3-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?stp=cp0_dst-png_p40x40&_nc_cat=1&ccb=1-7&_nc_sid=dbb9e7&_nc_ohc=KGMN7pZGaI8AX-HifdX&_nc_ht=scontent.fhan3-1.fna&oh=00_AT-KSHFMj11ROQeuuj6O5hXp_bRhBtS-yxBFhr3-MdkMCA&oe=634CFC78"
-                                     alt="avatar">
+                                <a href="user?profile=${post.user.id}">
+                                    <img style="border-radius: 50%"
+                                         src="${post.user.avatar}"
+                                         alt="avatar" width="40" height="40">
+                                </a>
                                 <div style="margin-left: 8px; text-align: left">
-                                    <h5>${post.getUser().getName()}</h5>
+                                    <a href="user?profile=${post.user.id}">
+                                        <h5>${post.getUser().getName()}</h5>
+                                    </a>
                                     <span style="font-size: 13px; color: #969696">${post.getTimePassed()}</span>
                                 </div>
                             </div>
-                            <form action="${pageContext.request.contextPath}/post" method="post" style="display:none;"
+                            <form action="post" method="post" style="display:none;"
                                   id="delete-${post.getId()}">
                                 <input type="hidden" name="idPost" value="${post.getId()}">
                                 <input type="hidden" name="action" value="delete">
@@ -244,13 +314,29 @@
                     </div>
 
                     <div class="article-interact">
-                        <div class="emotion-bar">
-                            Like
+                        <div class="emotion-bar" style="display: ${post.getCountLike() == 0 ? "none" : "flex"}">
+                            <img src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 16 16'%3e%3cdefs%3e%3clinearGradient id='a' x1='50%25' x2='50%25' y1='0%25' y2='100%25'%3e%3cstop offset='0%25' stop-color='%2318AFFF'/%3e%3cstop offset='100%25' stop-color='%230062DF'/%3e%3c/linearGradient%3e%3cfilter id='c' width='118.8%25' height='118.8%25' x='-9.4%25' y='-9.4%25' filterUnits='objectBoundingBox'%3e%3cfeGaussianBlur in='SourceAlpha' result='shadowBlurInner1' stdDeviation='1'/%3e%3cfeOffset dy='-1' in='shadowBlurInner1' result='shadowOffsetInner1'/%3e%3cfeComposite in='shadowOffsetInner1' in2='SourceAlpha' k2='-1' k3='1' operator='arithmetic' result='shadowInnerInner1'/%3e%3cfeColorMatrix in='shadowInnerInner1' values='0 0 0 0 0 0 0 0 0 0.299356041 0 0 0 0 0.681187726 0 0 0 0.3495684 0'/%3e%3c/filter%3e%3cpath id='b' d='M8 0a8 8 0 00-8 8 8 8 0 1016 0 8 8 0 00-8-8z'/%3e%3c/defs%3e%3cg fill='none'%3e%3cuse fill='url(%23a)' xlink:href='%23b'/%3e%3cuse fill='black' filter='url(%23c)' xlink:href='%23b'/%3e%3cpath fill='white' d='M12.162 7.338c.176.123.338.245.338.674 0 .43-.229.604-.474.725a.73.73 0 01.089.546c-.077.344-.392.611-.672.69.121.194.159.385.015.62-.185.295-.346.407-1.058.407H7.5c-.988 0-1.5-.546-1.5-1V7.665c0-1.23 1.467-2.275 1.467-3.13L7.361 3.47c-.005-.065.008-.224.058-.27.08-.079.301-.2.635-.2.218 0 .363.041.534.123.581.277.732.978.732 1.542 0 .271-.414 1.083-.47 1.364 0 0 .867-.192 1.879-.199 1.061-.006 1.749.19 1.749.842 0 .261-.219.523-.316.666zM3.6 7h.8a.6.6 0 01.6.6v3.8a.6.6 0 01-.6.6h-.8a.6.6 0 01-.6-.6V7.6a.6.6 0 01.6-.6z'/%3e%3c/g%3e%3c/svg%3e"
+                                 alt="Like" width="18" height="18" style="margin-right: 8px">
+                                ${post.getCountLike()}
                         </div>
                         <div class="interact-bar">
-                            <div class="comment-div" onclick="displayCommentArea(${post.getId()})">
+                            <div>
+
+                                <a href="like?idPost=${post.getId()}"
+                                   style="color: ${post.isLiked() ? "#2078f4" : "black"}">
+                                    <c:if test="${post.isLiked()}">
+                                        <i class="bi bi-hand-thumbs-up-fill" style="padding-right: 8px"></i>
+                                    </c:if>
+                                    <c:if test="${!post.isLiked()}">
+                                        <i class="bi bi-hand-thumbs-up" style="padding-right: 8px"></i>
+                                    </c:if>
+                                    Like
+                                </a>
+                            </div>
+                            <div class="comment-div">
                                 <a href="${pageContext.request.contextPath}/post?action=detail&id=${post.getId()}"
-                                   style="display: block;width: 100%;height: 100%;justify-content: center">Comment</a>
+                                   style="display: block;width: 100%;height: 100%;justify-content: center"><i
+                                        class="bi bi-chat-left" style="padding-right: 8px; font-size: 13px"></i>Comment</a>
                             </div>
                         </div>
                     </div>
@@ -269,9 +355,9 @@
                 <c:forEach items="${requestScope['friendList']}" var="friend">
                     <a href="#">
                         <div class="label user">
-                            <img src="https://scontent.fhan3-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?stp=cp0_dst-png_p40x40&_nc_cat=1&ccb=1-7&_nc_sid=dbb9e7&_nc_ohc=KGMN7pZGaI8AX-HifdX&_nc_ht=scontent.fhan3-1.fna&oh=00_AT-KSHFMj11ROQeuuj6O5hXp_bRhBtS-yxBFhr3-MdkMCA&oe=634CFC78"
+                            <img src="${friend.avatar}"
                                  alt="avatar">
-                            <h5>${friend.getName()}</h5>
+                            <h5>${friend.name}</h5>
                         </div>
                     </a>
                 </c:forEach>
@@ -313,22 +399,6 @@
     let file = null;
     let fileList = null;
 
-    let deleteImg = (imgName) => {
-
-        let listRef = firebase.storage().ref(fbBucketName);
-        listRef.listAll()
-            .then((res) => {
-                res.prefixes.forEach((folderRef) => {
-                    // All the prefixes under listRef.
-                    // You may call listAll() recursively on them.
-                });
-                res.items.forEach((itemRef) => {
-                    console.log(1)
-                });
-            }).catch((error) => {
-            // Uh-oh, an error occurred!
-        });
-    }
 
     fileButton.addEventListener('change', function (e) {
 
@@ -359,7 +429,7 @@
         button.disabled = false;
     })
 
-    var postButton = document.getElementById('post-button');
+    let postButton = document.getElementById('post-button');
 
     // listen for file selection
     postButton.addEventListener('click', function (e) {
@@ -369,22 +439,22 @@
         document.querySelector("progress").style.display = "block";
         // get file
 
-        var today = new Date();
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-        var time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-        var datetime = date + ' ' + time
+        let today = new Date();
+        let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+        let datetime = date + ' ' + time
         document.getElementById("date-created").value = datetime;
 
-        var userId = document.getElementById("userID").innerText;
+        let userId = document.getElementById("userId").innerText;
 
         if (file === null) {
             document.getElementById("form-post").submit();
         }
 
         // create a storage ref
-        var storageRef = firebase.storage().ref(fbBucketName + '/' + "userId=" + userId + '-post-' + "'" + datetime + "'");
+        let storageRef = firebase.storage().ref(fbBucketName + '/' + "userId=" + userId + '&post-created=' + datetime);
         // upload file
-        var uploadTask = storageRef.put(file);
+        let uploadTask = storageRef.put(file);
 
         document.querySelector(".fileButtonBg > span").style.display = "none";
         // update progress bar

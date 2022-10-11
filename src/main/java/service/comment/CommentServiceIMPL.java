@@ -1,7 +1,7 @@
 package service.comment;
 
 import model.Comment;
-import model.User;
+import service.Config;
 import service.user.IUserService;
 import service.user.UserServiceIMPL;
 
@@ -10,30 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommentServiceIMPL implements ICommentService {
-
-    private final String jdbcURL = "jdbc:mysql://localhost:3306/fakebook";
-    private final String jdbcUsername = "root";
-    private final String jdbcPassword = "123456";
-
-    private final int SQL_OK = 1;
-
     IUserService userService = new UserServiceIMPL();
-
-    protected Connection getConnection() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            return DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public List<Comment> selectAll() throws SQLException {
         List<Comment> commentList = new ArrayList<>();
         String SQL_GET_ALL = "select id,idser,idpost,content,created from comments";
         try (
-                Connection conn = getConnection();
+                Connection conn = Config.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_GET_ALL)
         ) {
             ResultSet rs = ps.executeQuery();
@@ -43,7 +27,6 @@ public class CommentServiceIMPL implements ICommentService {
                 int idPost = rs.getInt(3);
                 String content = rs.getString(4);
                 String created = rs.getString(5);
-
                 commentList.add(new Comment(id, idUser, idPost, content, created));
             }
         }
@@ -54,7 +37,7 @@ public class CommentServiceIMPL implements ICommentService {
     public boolean save(Comment comment) throws SQLException {
         String SQL_SAVE = "INSERT INTO comments(iduser,idpost,content) VALUES (?,?,?)";
         try (
-                Connection conn = getConnection();
+                Connection conn = Config.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_SAVE);
         ) {
             ps.setInt(1, comment.getIdUser());
@@ -62,7 +45,7 @@ public class CommentServiceIMPL implements ICommentService {
             ps.setString(3, comment.getContent());
 
             int rc = ps.executeUpdate();
-            return rc == SQL_OK;
+            return rc == 1;
         }
     }
 
@@ -70,7 +53,7 @@ public class CommentServiceIMPL implements ICommentService {
     public Comment getById(int id) throws SQLException {
         String SQL_GET_ID = "SELECT iduser,idpost,content,created FROM comments WHERE id = ?";
         try (
-                Connection conn = getConnection();
+                Connection conn = Config.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_GET_ID)
         ) {
             ps.setInt(1, id);
@@ -92,12 +75,12 @@ public class CommentServiceIMPL implements ICommentService {
     public boolean remove(int id) throws SQLException {
         String SQL_DELETE = "DELETE FROM comments WHERE id = ?";
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement(SQL_DELETE);
+                Connection conn = Config.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SQL_DELETE);
         ) {
             ps.setInt(1, id);
             int rc = ps.executeUpdate();
-            return rc == SQL_OK;
+            return rc == 1;
         }
     }
 
@@ -106,7 +89,7 @@ public class CommentServiceIMPL implements ICommentService {
         List<Comment> commentList = new ArrayList<>();
         String SQL_GET_IDPOST = "SELECT id,iduser,idpost,content,created from comments where idpost = ? order by created";
         try (
-                Connection conn = getConnection();
+                Connection conn = Config.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_GET_IDPOST);
         ) {
             ps.setInt(1, idPost);

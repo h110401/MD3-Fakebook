@@ -1,0 +1,68 @@
+.main-container {
+    height: calc(100% - 56px);
+}
+
+.position-fixed {
+    height: calc(100% - 56px);
+}
+
+.position-fixed::-webkit-scrollbar {
+    display: none;
+}
+
+@keyframes changeColor {
+    from {
+        font-size: 30px;
+        margin-right: 5px;
+    }
+    to {
+        font-size: 40px;
+        margin-right: 0;
+    }
+}
+
+.animation:hover {
+    font-size: 40px;
+    animation-name: changeColor;
+    animation-duration: 50ms;
+    margin-right: 0;
+}
+
+.animation {
+    font-size: 30px;
+    margin-right: 5px;
+}
+
+#chatbox-container a, #chatbox-container a:hover, #chatbox-container a:active {
+    text-decoration: none;
+    color: black;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+#message-form input {
+    border: none;
+    background: #cbccd0;
+    width: 90%;
+    padding: 8px 18px;
+    border-radius: 32px;
+}
+
+#message-form input:focus, #message-form input:active {
+    border: none;
+    outline: none;
+}
+
+#message-form button {
+    border: none;
+    color: white;
+    width: 8%;
+    background: rgb(0, 132, 255);
+    border-radius: 32px;
+    padding: 8px 0;
+}
+.hover:hover {
+    background: #d5d5d5;
+}

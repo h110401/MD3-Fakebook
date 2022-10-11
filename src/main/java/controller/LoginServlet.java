@@ -24,15 +24,21 @@ public class LoginServlet extends HttpServlet {
 
         if (request.getAttribute("id") != null) {
             int id = Integer.parseInt(String.valueOf(request.getAttribute("id")));
-            User user = null;
+            User user;
             try {
                 user = userService.getById(id);
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
             if (user != null) {
-                request.getSession().setAttribute("userLogin", user);
-                response.sendRedirect("home");
+                if (user.isStatus()) {
+                    request.getRequestDispatcher("/login/login.jsp").forward(request, response);
+                } else {
+                    user.setRoles(userService.findRoleByUserId(id));
+                    request.getSession().setAttribute("userLogin", user);
+                    request.getSession().setAttribute("role", user.getRoleName());
+                    response.sendRedirect("home");
+                }
             } else {
                 request.getRequestDispatcher("/login/login.jsp").forward(request, response);
             }
@@ -58,6 +64,11 @@ public class LoginServlet extends HttpServlet {
                 user = userService.getById(isLogin);
             } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
+            }
+
+            if (user.isStatus()) {
+                response.sendRedirect("login");
+                return;
             }
 
             Cookie userId = new Cookie("id", String.valueOf(isLogin));

@@ -17,4 +17,8 @@ public interface IFriendService extends IGeneric<Friend> {
     void setStatus(int id, boolean status) throws SQLException, ClassNotFoundException;
 
     List<User> getFriendList(int idLogin) throws SQLException, ClassNotFoundException;
+
+    List<Friend> findByUserId(int id) throws SQLException, ClassNotFoundException;
+
+    void deleteFriend(int id, int idLogin) throws SQLException, ClassNotFoundException;
 }

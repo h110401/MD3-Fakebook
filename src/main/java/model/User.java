@@ -1,20 +1,29 @@
 package model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class User {
 
     private int id;
     private String name;
     private String email;
     private String password;
+    private String avatar;
+    private boolean status;
+
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
     }
 
-    public User(int id, String name, String email, String password) {
+    public User(int id, String name, String email, String password, String avatar, boolean status) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.avatar = avatar;
+        this.status = status;
     }
 
     public int getId() {
@@ -47,6 +56,39 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public RoleName getRoleName() {
+        for (Role role : roles) {
+            if (role.getRoleName() == RoleName.ADMIN) return RoleName.ADMIN;
+            if (role.getRoleName() == RoleName.USER) return RoleName.USER;
+            if (role.getRoleName() == RoleName.PM) return RoleName.PM;
+        }
+        return null;
     }
 
     @Override

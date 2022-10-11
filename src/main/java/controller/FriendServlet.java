@@ -28,8 +28,43 @@ public class FriendServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        int id;
+        if (action == null) {
+            action = "";
+        }
+        switch (action) {
+            case "accept":
+                id = Integer.parseInt(request.getParameter("id"));
+                acceptFriendRequest(id);
+                break;
+            case "delete":
+                id = Integer.parseInt(request.getParameter("id"));
+                deleteRequest(id);
+                break;
+            case "delete-friend":
+                deleteFriend(request, response);
+        }
+        searchFriend(request, response);
+    }
+
+    private void deleteFriend(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            User userLogin = (User) request.getSession().getAttribute("userLogin");
+            int id = Integer.parseInt(request.getParameter("id"));
+            friendService.deleteFriend(id, userLogin.getId());
+            searchFriend(request, response);
+        } catch (SQLException | ClassNotFoundException | IOException | ServletException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void searchFriend(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User userLogin = (User) request.getSession().getAttribute("userLogin");
         try {
+            List<Friend> listRequest = friendService.findByUserId(userLogin.getId());
+            request.setAttribute("requestList", listRequest);
             List<User> friendList = friendService.getFriendList(userLogin.getId());
             request.setAttribute("friendList", friendList);
         } catch (SQLException | ClassNotFoundException e) {
@@ -40,6 +75,56 @@ public class FriendServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "";
+        }
+        switch (action) {
+            case "search":
+                actionSearchRequest(request, response);
+                break;
+            case "wall":
+                actionWall(request, response);
+                break;
+        }
+    }
+
+    private void actionWall(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        FriendStatus status = FriendStatus.valueOf(request.getParameter("status"));
+        int iduser = Integer.parseInt(request.getParameter("iduser"));
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
+        User user;
+        Friend friend;
+        try {
+            user = userService.getById(iduser);
+            friend = friendService.findFriendRequest(userLogin.getId(), user.getId());
+
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        switch (status) {
+            case NOT_FRIEND:
+                createFriendRequest(userLogin, user);
+                break;
+            case SENT:
+                retrieveFriendRequest(friend.getId());
+                break;
+            case ACCEPT:
+                acceptFriendRequest(friend.getId());
+                break;
+        }
+        response.sendRedirect(request.getContextPath() + "/user?profile=" + iduser);
+    }
+
+    private void deleteRequest(int id) {
+        try {
+            friendService.remove(id);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void actionSearchRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         FriendStatus status = FriendStatus.valueOf(request.getParameter("status"));
         String search = request.getParameter("search");
         int iduser = Integer.parseInt(request.getParameter("iduser"));
@@ -64,7 +149,7 @@ public class FriendServlet extends HttpServlet {
                 acceptFriendRequest(friend.getId());
                 break;
         }
-        response.sendRedirect("/search?search=" + search);
+        response.sendRedirect(request.getContextPath() + "/search?search=" + search);
     }
 
     private void acceptFriendRequest(int id) {

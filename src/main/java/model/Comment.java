@@ -12,6 +12,10 @@ public class Comment {
     private String content;
     private String createdDate;
 
+    private boolean isLiked;
+
+    private int countLike;
+
     public Comment() {
     }
 
@@ -79,7 +83,23 @@ public class Comment {
         int minute = (int) (timePassed / (1000 * 60) % 60);
         int hour = (int) (timePassed / (1000 * 60 * 60) % 24);
         int day = (int) (timePassed / (1000 * 60 * 60 * 24));
-        return (day != 0 ? day + " d" : (hour != 0 ? hour + " h" : (minute != 0 ? minute + " m" : second + " s")));
+        return (day != 0 ? day + "d" : (hour != 0 ? hour + "h" : (minute != 0 ? minute + "m" : second + "s")));
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    public int getCountLike() {
+        return countLike;
+    }
+
+    public void setCountLike(int countLike) {
+        this.countLike = countLike;
     }
 
     @Override

@@ -5,6 +5,8 @@ import model.Post;
 import model.User;
 import service.comment.CommentServiceIMPL;
 import service.comment.ICommentService;
+import service.like.ILikeService;
+import service.like.LikeServiceIMPL;
 import service.post.IPostService;
 import service.post.PostServiceIMPL;
 import service.user.UserServiceIMPL;
@@ -21,11 +23,13 @@ public class PostServlet extends HttpServlet {
 
     IPostService postService;
     ICommentService commentService;
+    ILikeService likeService;
 
     @Override
     public void init() throws ServletException {
         postService = new PostServiceIMPL();
         commentService = new CommentServiceIMPL();
+        likeService = new LikeServiceIMPL();
     }
 
     @Override
@@ -55,10 +59,18 @@ public class PostServlet extends HttpServlet {
     }
 
     private void detailPost(HttpServletRequest request, HttpServletResponse response) {
+        User userLogin = (User) request.getSession().getAttribute("userLogin");
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             Post post = postService.getById(id);
+            post.setLiked(likeService.checkLikePost(id, userLogin.getId()) != -1);
+            post.setCountLike(likeService.findByIdPost(id).size());
             List<Comment> commentList = commentService.findByIdPost(id);
+            for (Comment comment : commentList) {
+                boolean isLiked = likeService.checkLikeCmt(comment.getId(), userLogin.getId()) != -1;
+                comment.setLiked(isLiked);
+                comment.setCountLike(likeService.findByIdCmt(comment.getId()).size());
+            }
             request.setAttribute("post", post);
             request.setAttribute("commentList", commentList);
             request.getRequestDispatcher("/post/post-detail.jsp").forward(request, response);

@@ -51,19 +51,6 @@ public class SearchServlet extends HttpServlet {
             for (User user : userList) {
                 Friend friend = friendService.findFriendRequest(userLogin.getId(), user.getId());
                 relative.put(user.getId(), friendService.getFriendStatus(friend,userLogin.getId()));
-//                if (friend == null) {
-//                    relative.put(user.getId(), "not friend");
-//                } else {
-//                    if (friend.isStatus()) {
-//                        relative.put(user.getId(), "friend");
-//                    } else {
-//                        if (friend.getUser1().getId() == userLogin.getId()) {
-//                            relative.put(user.getId(), "sent");
-//                        } else {
-//                            relative.put(user.getId(), "accept");
-//                        }
-//                    }
-//                }
             }
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);

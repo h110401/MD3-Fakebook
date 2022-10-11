@@ -108,3 +108,19 @@ let addPhoto = (e) => {
 }
 document.getElementById('fileButtonLabel').addEventListener('drop', addPhoto)
 document.getElementById('fileButtonLabel').addEventListener('dragover', addPhoto)
+
+
+let pre = true;
+let noticeDiv = document.getElementById("notice-div");
+let displayNotification = () => {
+    noticeDiv.style.display = noticeDiv.style.display === "none" ? "block" : "none";
+    pre = false;
+}
+addEventListener("click", e => {
+    if (noticeDiv.style.display === "block") {
+        if (e.target !== noticeDiv && pre && !noticeDiv.contains(e.target)) {
+            noticeDiv.style.display = "none";
+        }
+        pre = true;
+    }
+})

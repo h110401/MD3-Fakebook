@@ -2,6 +2,8 @@ package service.post;
 
 import model.Post;
 import model.User;
+import service.Config;
+import service.user.IUserService;
 import service.user.UserServiceIMPL;
 
 import java.sql.*;
@@ -11,22 +13,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static service.Config.getConnection;
+
 public class PostServiceIMPL implements IPostService {
-    private final String jdbcURL = "jdbc:mysql://localhost:3306/fakebook";
-    private final String jdbcUsername = "root";
-    private final String jdbcPassword = "123456";
 
     private final int SQL_OK = 1;
 
-    protected Connection getConnection() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            return DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    private final IUserService userService = new UserServiceIMPL();
 
     @Override
     public List<Post> selectAll() throws SQLException, ClassNotFoundException {
@@ -40,7 +33,7 @@ public class PostServiceIMPL implements IPostService {
             while (rs.next()) {
                 int id = rs.getInt("id");
                 int idUser = rs.getInt("idUser");
-                User user = new UserServiceIMPL().getById(idUser);
+                User user = userService.getById(idUser);
                 String content = rs.getString("content");
 
                 String imgUrl = rs.getString("imgUrl");
@@ -83,7 +76,7 @@ public class PostServiceIMPL implements IPostService {
             if (rs.next()) {
                 int idPost = rs.getInt("id");
                 int idUser = rs.getInt("idUser");
-                User user = new UserServiceIMPL().getById(idUser);
+                User user = userService.getById(idUser);
                 String content = rs.getString("content");
                 String imgUrl = rs.getString("imgUrl");
                 String created = rs.getString("created");
@@ -108,4 +101,25 @@ public class PostServiceIMPL implements IPostService {
         }
     }
 
+    @Override
+    public List<Post> findByUserId(int idUser) throws SQLException, ClassNotFoundException {
+        List<Post> postList = new ArrayList<>();
+        String SQL_FIND_USER_ID = "select id,idUser,content,imgUrl,created from posts where idUser = ? order by created desc";
+        try (
+                Connection conn = Config.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SQL_FIND_USER_ID);
+        ) {
+            ps.setInt(1, idUser);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String content = rs.getString("content");
+                String imgUrl = rs.getString("imgUrl");
+                String created = rs.getString("created");
+                User user = userService.getById(idUser);
+                postList.add(new Post(id, user, content, imgUrl, created));
+            }
+        }
+        return postList;
+    }
 }

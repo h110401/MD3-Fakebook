@@ -2,8 +2,37 @@ body {
     background: #f0f2f5 !important;
     margin: 0;
 }
+
 .body {
     margin-top: 56px;
-    width: 100%;
+    margin-left: 300px;
     height: calc(100% - 56px);
+}
+
+.friend-request {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    font-size: 17px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.friend-request:hover {
+    background: #e6e6e6;
+}
+
+#friend-btn button {
+    width: 100%;
+    height: 36px;
+    border-radius: 8px;
+    outline: none;
+    border: none;
+    font-weight: 600;
+}
+
+.friend > div {
+    height: 100px;
 }

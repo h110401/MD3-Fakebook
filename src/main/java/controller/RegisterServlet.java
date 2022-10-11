@@ -1,6 +1,8 @@
 package controller;
 
+import model.RoleName;
 import model.User;
+import service.role.RoleServiceIMPL;
 import service.user.IUserService;
 import service.user.UserServiceIMPL;
 
@@ -26,6 +28,9 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("utf-8");
+
         String firstName = request.getParameter("first-name");
         String surname = request.getParameter("surname");
         String email = request.getParameter("email");
@@ -37,8 +42,7 @@ public class RegisterServlet extends HttpServlet {
         user.setName(name);
         user.setEmail(email);
         user.setPassword(password);
-
-        System.out.println(user);
+        user.getRoles().add(new RoleServiceIMPL().findByRoleName(RoleName.USER));
 
         try {
             userService.save(user);

@@ -3,6 +3,7 @@ package service.friend;
 import model.Friend;
 import model.FriendStatus;
 import model.User;
+import service.Config;
 import service.user.IUserService;
 import service.user.UserServiceIMPL;
 
@@ -10,24 +11,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static service.Config.getConnection;
+
 public class FriendServiceIMPL implements IFriendService {
 
     private final IUserService userService = new UserServiceIMPL();
-    private final String jdbcURL = "jdbc:mysql://localhost:3306/fakebook";
-    private final String jdbcUsername = "root";
-    private final String jdbcPassword = "123456";
-
     private final int SQL_OK = 1;
 
-
-    protected Connection getConnection() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            return DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public List<Friend> selectAll() throws SQLException, ClassNotFoundException {
@@ -180,5 +170,30 @@ public class FriendServiceIMPL implements IFriendService {
             }
         }
         return friendList;
+    }
+
+    @Override
+    public List<Friend> findByUserId(int id) throws SQLException, ClassNotFoundException {
+        List<Friend> friendList = new ArrayList<>();
+        String SQL_FIND = "SELECT * FROM friends WHERE iduser2 = ? AND status = false";
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(SQL_FIND);
+        ) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int idF = rs.getInt(1);
+                int idUser = rs.getInt(2);
+                friendList.add(new Friend(idF, userService.getById(idUser), userService.getById(id), false));
+            }
+        }
+        return friendList;
+    }
+
+    @Override
+    public void deleteFriend(int id, int idLogin) throws SQLException, ClassNotFoundException {
+        Friend friend = findFriendRequest(id, idLogin);
+        remove(friend.getId());
     }
 }
